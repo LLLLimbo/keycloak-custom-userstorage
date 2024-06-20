@@ -1,31 +1,25 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+# Name of the action
+name: Automatic Release
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
-
+# Event to run on
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  release:
+    types: [created]
 
+permissions:
+  contents: write
+
+# Jobs that will execute
 jobs:
-  build:
-
+  release:
+    name: Setup Environment, Build JAR and Release Project
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - name: Automatic Release
+        uses: Fulminazzo/java-automatic-release@v1
+        with:
+          java-version: 17
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
